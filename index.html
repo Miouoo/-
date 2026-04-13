@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>號碼顯示</title>
+    <style>
+        body { text-align: center; font-family: sans-serif; background: #2c3e50; color: white; padding-top: 100px; }
+        #n { font-size: 15rem; color: #e74c3c; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>目前號碼</h1>
+    <div id="n">--</div>
+    <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-database-compat.js"></script>
+    <script>
+        const config = {
+            apiKey: "AIzaSyBZoqXabXTdUspS-6UrT07su9Cyo_pI5Gc",
+            authDomain: "queue-tcfsh121.firebaseapp.com",
+            projectId: "queue-tcfsh121",
+            databaseURL: "https://queue-tcfsh121-default-rtdb.firebaseio.com/" // 這裡換成你剛看到的網址
+        };
+        firebase.initializeApp(config);
+        firebase.database().ref("num").on("value", s => { document.getElementById("n").innerText = s.val() || 0; });
+    </script>
+</body>
+</html>
