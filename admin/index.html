@@ -1,18 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>叫號管理</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>叫號後台管理</title>
     <style>
-        body { text-align: center; font-family: sans-serif; padding-top: 50px; }
-        button { font-size: 2rem; padding: 20px; margin: 10px; cursor: pointer; border-radius: 10px; }
+        body { font-family: sans-serif; padding: 20px; text-align: center; background: #f4f7f6; }
+        .box { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h2 { color: #333; }
+        textarea { width: 90%; height: 60px; font-size: 1.2rem; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        button { background: #2ecc71; color: white; border: none; padding: 15px 30px; font-size: 1.1rem; cursor: pointer; border-radius: 5px; margin-top: 10px; }
+        button:hover { background: #27ae60; }
     </style>
 </head>
 <body>
-    <h1>叫號控制</h1>
-    <div id="s" style="font-size: 5rem;">0</div>
-    <button onclick="c(-1)">上一號</button>
-    <button onclick="c(1)" style="background: #2ecc71; color: white;">下一號</button>
+    <h1>叫號管理系統</h1>
+
+    <div class="box">
+        <h2>🕒 準備中 (號碼以逗號隔開)</h2>
+        <textarea id="preparingInput" placeholder="例如: 101, 102, 103"></textarea>
+        <br>
+        <button onclick="update('preparing')">更新準備中</button>
+    </div>
+
+    <div class="box">
+        <h2>✅ 可取餐 (號碼以逗號隔開)</h2>
+        <textarea id="readyInput" placeholder="例如: 098, 099"></textarea>
+        <br>
+        <button onclick="update('ready')" style="background: #3498db;">更新可取餐</button>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-database-compat.js"></script>
     <script>
@@ -20,13 +37,23 @@
             apiKey: "AIzaSyBZoqXabXTdUspS-6UrT07su9Cyo_pI5Gc",
             authDomain: "queue-tcfsh121.firebaseapp.com",
             projectId: "queue-tcfsh121",
-            databaseURL: "https://queue-tcfsh121-default-rtdb.firebaseio.com/" // 這裡也要同步
+            databaseURL: "https://queue-tcfsh121-default-rtdb.firebaseio.com/"
         };
         firebase.initializeApp(config);
-        const db = firebase.database().ref("num");
-        let n = 0;
-        db.on("value", s => { n = s.val() || 0; document.getElementById("s").innerText = n; });
-        function c(v) { db.set(n + v); }
+        const db = firebase.database();
+
+        // 讀取現有資料
+        db.ref("queueData").on("value", s => {
+            const data = s.val() || { preparing: "", ready: "" };
+            document.getElementById("preparingInput").value = data.preparing;
+            document.getElementById("readyInput").value = data.ready;
+        });
+
+        function update(type) {
+            const val = document.getElementById(type + "Input").value;
+            db.ref("queueData/" + type).set(val);
+            alert("已更新！");
+        }
     </script>
 </body>
 </html>
