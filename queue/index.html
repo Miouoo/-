@@ -3,27 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>號碼顯示器</title>
+    <title>目前叫號</title>
     <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f0f2f5; }
-        h1 { color: #333; font-size: 2rem; }
-        #number { font-size: 10rem; color: #e74c3c; font-weight: bold; margin: 20px 0; }
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f4f4f9; }
+        h1 { font-size: 3rem; color: #333; }
+        #number { font-size: 15rem; color: #ff4757; font-weight: bold; }
     </style>
 </head>
 <body>
-    <h1>目前請進</h1>
+    <h1>請進</h1>
     <div id="number">--</div>
 
     <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-database-compat.js"></script>
     <script>
-        // *** 請在此貼上你剛才複製的 firebaseConfig ***
-        const firebaseConfig = { /* 這裡換成你的 */ };
-        
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZoqXabXTdUspS-6UrT07su9Cyo_pI5Gc",
+            authDomain: "queue-tcfsh121.firebaseapp.com",
+            projectId: "queue-tcfsh121",
+            storageBucket: "queue-tcfsh121.firebasestorage.app",
+            messagingSenderId: "178038658777",
+            appId: "1:178038658777:web:505b960a92beaf88ea10c8",
+            databaseURL: "https://queue-tcfsh121-default-rtdb.firebaseio.com/"
+        };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database().ref("currentNumber");
-
-        // 監聽號碼變化
         db.on("value", (snapshot) => {
             document.getElementById("number").innerText = snapshot.val() || 0;
         });
