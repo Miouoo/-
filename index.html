@@ -1,16 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>號碼顯示</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>取餐進度查詢</title>
     <style>
-        body { text-align: center; font-family: sans-serif; background: #2c3e50; color: white; padding-top: 100px; }
-        #n { font-size: 15rem; color: #e74c3c; font-weight: bold; }
+        body { font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; background: #2c3e50; color: white; }
+        header { text-align: center; padding: 20px; font-size: 2rem; background: #1a252f; }
+        .container { display: flex; flex: 1; text-align: center; }
+        .column { flex: 1; padding: 20px; border: 1px solid #34495e; }
+        .preparing { background: #2c3e50; }
+        .ready { background: #27ae60; }
+        h2 { font-size: 2.5rem; margin-bottom: 30px; border-bottom: 2px solid rgba(255,255,255,0.2); padding-bottom: 10px; }
+        .number-list { font-size: 4rem; font-weight: bold; line-height: 1.5; word-wrap: break-word; }
     </style>
 </head>
 <body>
-    <h1>目前號碼</h1>
-    <div id="n">--</div>
+    <header>取餐狀態</header>
+    <div class="container">
+        <div class="column preparing">
+            <h2>🕒 準備中</h2>
+            <div id="preparingList" class="number-list">--</div>
+        </div>
+        <div class="column ready">
+            <h2>✅ 可取餐</h2>
+            <div id="readyList" class="number-list">--</div>
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-database-compat.js"></script>
     <script>
@@ -18,10 +35,15 @@
             apiKey: "AIzaSyBZoqXabXTdUspS-6UrT07su9Cyo_pI5Gc",
             authDomain: "queue-tcfsh121.firebaseapp.com",
             projectId: "queue-tcfsh121",
-            databaseURL: "https://queue-tcfsh121-default-rtdb.firebaseio.com/" // 這裡換成你剛看到的網址
+            databaseURL: "https://queue-tcfsh121-default-rtdb.firebaseio.com/"
         };
         firebase.initializeApp(config);
-        firebase.database().ref("num").on("value", s => { document.getElementById("n").innerText = s.val() || 0; });
+        
+        firebase.database().ref("queueData").on("value", s => {
+            const data = s.val() || { preparing: "暫無資料", ready: "暫無資料" };
+            document.getElementById("preparingList").innerText = data.preparing || "無";
+            document.getElementById("readyList").innerText = data.ready || "無";
+        });
     </script>
 </body>
 </html>
