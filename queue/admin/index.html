@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>叫號控制台</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 50px; }
+        button { font-size: 1.5rem; padding: 15px 30px; margin: 10px; cursor: pointer; border: none; border-radius: 5px; }
+        .btn-next { background-color: #2ecc71; color: white; }
+        .btn-prev { background-color: #95a5a6; color: white; }
+        #current { font-size: 3rem; margin: 20px; }
+    </style>
+</head>
+<body>
+    <h1>控制台</h1>
+    <div id="current">目前號碼：讀取中...</div>
+    <button class="btn-prev" onclick="change(-1)">上一號</button>
+    <button class="btn-next" onclick="change(1)">下一號</button>
+    <br>
+    <button onclick="reset()">歸零重置</button>
+
+    <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-database-compat.js"></script>
+    <script>
+        // *** 同樣在這裡貼上 firebaseConfig ***
+        const firebaseConfig = { /* 這裡換成你的 */ };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database().ref("currentNumber");
+        let currentNum = 0;
+
+        db.on("value", (snapshot) => {
+            currentNum = snapshot.val() || 0;
+            document.getElementById("current").innerText = "目前號碼：" + currentNum;
+        });
+
+        function change(step) {
+            db.set(currentNum + step);
+        }
+        function reset() {
+            if(confirm("確定歸零？")) db.set(0);
+        }
+    </script>
+</body>
+</html>
