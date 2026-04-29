@@ -3,31 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>叫號後台管理</title>
+    <title>雙機同步管理後台</title>
     <style>
         body { font-family: sans-serif; padding: 20px; text-align: center; background: #f4f7f6; }
         .box { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        h2 { color: #333; }
-        textarea { width: 90%; height: 60px; font-size: 1.2rem; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-        button { background: #2ecc71; color: white; border: none; padding: 15px 30px; font-size: 1.1rem; cursor: pointer; border-radius: 5px; margin-top: 10px; }
-        button:hover { background: #27ae60; }
+        .preparing-zone { border-top: 8px solid #34495e; }
+        .ready-zone { border-top: 8px solid #27ae60; }
+        textarea { width: 90%; height: 80px; font-size: 1.2rem; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin-top: 10px; }
+        button { color: white; border: none; padding: 15px 30px; font-size: 1.1rem; cursor: pointer; border-radius: 5px; margin-top: 10px; width: 100%; }
+        .btn-prep { background: #34495e; }
+        .btn-ready { background: #27ae60; }
+        .status { font-size: 0.9rem; color: #7f8c8d; margin-top: 5px; }
     </style>
 </head>
 <body>
-    <h1>叫號管理系統</h1>
+    <h1>分區叫號管理</h1>
 
-    <div class="box">
-        <h2>🕒 準備中 (號碼請換行)</h2>
-        <textarea id="preparingInput" placeholder=""></textarea>
-        <br>
-        <button onclick="update('preparing')">更新準備中</button>
+    <div class="box preparing-zone">
+        <h2>🕒 準備中號碼</h2>
+        <textarea id="preparingInput" placeholder="輸入號碼..."></textarea>
+        <button class="btn-prep" onclick="updateZone('preparing')">僅更新準備中</button>
+        <div id="preparingStatus" class="status">同步中...</div>
     </div>
 
-    <div class="box">
-        <h2>✅ 可取餐 (號碼請換行)</h2>
-        <textarea id="readyInput" placeholder=""></textarea>
-        <br>
-        <button onclick="update('ready')" style="background: #3498db;">更新可取餐</button>
+    <div class="box ready-zone">
+        <h2>✅ 可取餐號碼</h2>
+        <textarea id="readyInput" placeholder="輸入號碼..."></textarea>
+        <button class="btn-ready" onclick="updateZone('ready')">僅更新可取餐</button>
+        <div id="readyStatus" class="status">同步中...</div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-app-compat.js"></script>
@@ -42,17 +45,24 @@
         firebase.initializeApp(config);
         const db = firebase.database();
 
-        // 讀取現有資料
-        db.ref("queueData").on("value", s => {
-            const data = s.val() || { preparing: "", ready: "" };
-            document.getElementById("preparingInput").value = data.preparing;
-            document.getElementById("readyInput").value = data.ready;
+    
+        db.ref("queueData/preparing").on("value", s => {
+            document.getElementById("preparingInput").value = s.val() || "";
+            document.getElementById("preparingStatus").innerText = "最後同步時間: " + new Date().toLocaleTimeString();
         });
 
-        function update(type) {
+        
+        db.ref("queueData/ready").on("value", s => {
+            document.getElementById("readyInput").value = s.val() || "";
+            document.getElementById("readyStatus").innerText = "最後同步時間: " + new Date().toLocaleTimeString();
+        });
+
+        
+        function updateZone(type) {
             const val = document.getElementById(type + "Input").value;
-            db.ref("queueData/" + type).set(val);
-            alert("已更新！");
+            db.ref("queueData/" + type).set(val)
+              .then(() => alert(type === 'preparing' ? "準備中清單已更新" : "取餐清單已更新"))
+              .catch(err => alert("更新失敗: " + err));
         }
     </script>
 </body>
